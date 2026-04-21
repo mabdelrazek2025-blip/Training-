@@ -7,20 +7,19 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
 <style>
-body {
-  font-family: Arial;
-  text-align: center;
-  background: #87CEEB;
-  padding-top: 50px;
+body{
+  font-family:Arial;
+  text-align:center;
+  background:#87CEEB;
+  padding-top:50px;
 }
 
-.box {
-  background: white;
-  padding: 20px;
-  margin: auto;
-  width: 80%;
-  border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+.box{
+  background:white;
+  padding:20px;
+  margin:auto;
+  width:80%;
+  border-radius:10px;
 }
 </style>
 </head>
@@ -33,7 +32,6 @@ body {
 </div>
 
 <script>
-try {
 
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
@@ -49,12 +47,12 @@ const url = new URLSearchParams(window.location.search);
 const player = url.get("player");
 
 if (!player) {
-  document.getElementById("status").innerText = "❌ No player found";
+  document.getElementById("status").innerText = "❌ No player";
 } else {
 
   document.getElementById("status").innerText = "Sending: " + player;
 
-  /* IMPORTANT FIX: PUSH instead of SET */
+  /* IMPORTANT: PUSH DATA */
   db.ref("game").push({
     player: player,
     time: Date.now()
@@ -65,9 +63,6 @@ if (!player) {
   }, 800);
 }
 
-} catch (e) {
-  document.body.innerHTML = "<h3>Error</h3><p>" + e.message + "</p>";
-}
 </script>
 
 </body>
