@@ -11,8 +11,6 @@ body {
   margin: 0;
   font-family: Arial;
   text-align: center;
-
-  /* REAL BACKGROUND */
   background: url("https://images.unsplash.com/photo-1506744038136-46273834b3fb") no-repeat center center fixed;
   background-size: cover;
 }
@@ -22,7 +20,6 @@ h2 {
   text-shadow: 0 2px 5px black;
 }
 
-/* BUTTONS */
 button {
   padding: 8px 14px;
   margin: 5px;
@@ -31,13 +28,12 @@ button {
   cursor: pointer;
 }
 
-/* CAMERA */
 #reader {
   width: 300px;
   margin: auto;
 }
 
-/* 2 MOUNTAINS */
+/* layout */
 .container {
   display: flex;
   justify-content: center;
@@ -45,18 +41,16 @@ button {
   margin-top: 20px;
 }
 
-/* CARTOON MOUNTAIN */
+/* mountain */
 .mountain {
   width: 220px;
   height: 360px;
   position: relative;
-
   background: linear-gradient(to top, #5a3d2b, #c9a27a);
   clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
   box-shadow: 0 10px 25px rgba(0,0,0,0.5);
 }
 
-/* SNOW TOP */
 .mountain::before {
   content: "";
   position: absolute;
@@ -68,7 +62,7 @@ button {
   border-radius: 50%;
 }
 
-/* RAMP STEPS */
+/* ramp lines */
 .steps {
   position: absolute;
   width: 100%;
@@ -82,13 +76,15 @@ button {
   );
 }
 
-/* CHARACTER (EMOJI STYLE) */
+/* CHARACTER (NOW LEFT SIDE + DIAGONAL) */
 .character {
   position: absolute;
+  left: -30px; /* 👈 outside left of mountain */
   bottom: 0;
-  transform: translateX(-50%);
-  transition: bottom 0.5s ease-in-out;
+
   font-size: 40px;
+  transform: translateX(-50%);
+  transition: bottom 0.5s ease, left 0.5s ease;
   filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
 }
 </style>
@@ -96,37 +92,29 @@ button {
 
 <body>
 
-<h2>🏔 Mountain Climb Game</h2>
+<h2>🏔 Diagonal Mountain Climb Game</h2>
 
 <button onclick="startScanner()">📷 Start Camera</button>
 
 <div id="reader"></div>
 
-<!-- BUTTONS -->
 <div>
   <button onclick="manual('YOUNG')">🧑 Young</button>
   <button onclick="manual('OLD')">👴 Old</button>
 </div>
 
-<!-- MOUNTAINS -->
 <div class="container">
 
   <!-- MOUNTAIN 1 -->
   <div class="mountain">
     <div class="steps"></div>
-
-    <div id="young" class="character" style="left:50%;">
-      🧑
-    </div>
+    <div id="young" class="character">🧑</div>
   </div>
 
   <!-- MOUNTAIN 2 -->
   <div class="mountain">
     <div class="steps"></div>
-
-    <div id="old" class="character" style="left:50%;">
-      👴
-    </div>
+    <div id="old" class="character">👴</div>
   </div>
 
 </div>
@@ -141,15 +129,24 @@ let y = 0;
 let o = 0;
 const max = 10;
 
-function move(id, step){
+/* DIAGONAL MOVE */
+function move(id, step, offset){
   const el = document.getElementById(id);
+
   const maxHeight = 320;
   const stepHeight = maxHeight / max;
 
-  el.style.bottom = (step * stepHeight) + "px";
+  // vertical movement
+  let bottom = step * stepHeight;
+
+  // diagonal movement (moves slightly right as it climbs)
+  let left = -30 + (step * 8);
+
+  el.style.bottom = bottom + "px";
+  el.style.left = left + "px";
 }
 
-/* BUTTON + QR CONTROL */
+/* CONTROL */
 function manual(type){
 
   if(type === "YOUNG" && y < max){
