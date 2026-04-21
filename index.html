@@ -1,29 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 <style>
 body {
   margin: 0;
   font-family: Arial;
   text-align: center;
 
-  /* REAL SKY IMAGE */
   background: url("https://images.unsplash.com/photo-1506744038136-46273834b3fb") no-repeat center center fixed;
   background-size: cover;
 }
 
-/* layout */
+h2 { color: white; text-shadow: 0 2px 5px black; }
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  margin: 10px;
+  cursor: pointer;
+}
+
 .container {
   display: flex;
   justify-content: center;
   gap: 60px;
-  margin-top: 40px;
+  margin-top: 30px;
 }
 
-/* REALISTIC mountain using image */
+/* REALISTIC MOUNTAIN */
 .mountain {
   width: 220px;
   height: 320px;
 
-  background: url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") 
-  center/cover;
+  background: url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") center/cover;
 
   position: relative;
   border-radius: 10px;
@@ -31,7 +45,6 @@ body {
   overflow: hidden;
 }
 
-/* dark overlay for realism */
 .mountain::after {
   content: "";
   position: absolute;
@@ -40,25 +53,110 @@ body {
   background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
 }
 
-/* character */
+/* CHARACTER */
 .character {
   position: absolute;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 60px;
+  width: 70px;
   transition: bottom 0.5s ease-in-out;
-  z-index: 2;
   filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
 }
 
-/* walking animation */
 .walk {
   animation: bounce 0.4s infinite alternate;
 }
 
 @keyframes bounce {
   from { transform: translateX(-50%) translateY(0px); }
-  to { transform: translateX(-50%) translateY(-3px); }
+  to { transform: translateX(-50%) translateY(-4px); }
+}
+
+#reader {
+  margin: auto;
+  width: 300px;
 }
 </style>
+</head>
+
+<body>
+
+<h2>🏔 QR Mountain Climb Game</h2>
+
+<button onclick="startScanner()">📷 Start Camera</button>
+
+<div id="reader"></div>
+
+<div class="container">
+
+  <div class="mountain">
+    <img id="young" class="character"
+    src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png">
+  </div>
+
+  <div class="mountain">
+    <img id="old" class="character"
+    src="https://cdn-icons-png.flaticon.com/512/4140/4140051.png">
+  </div>
+
+</div>
+
+<h3 style="color:white;">QR Codes</h3>
+<div id="q1"></div>
+<div id="q2"></div>
+
+<script>
+let y = 0;
+let o = 0;
+const max = 10;
+
+function move(id, step){
+  const el = document.getElementById(id);
+  const maxHeight = 260;
+  const stepHeight = maxHeight / max;
+
+  el.classList.add("walk");
+
+  el.style.bottom = (step * stepHeight) + "px";
+
+  setTimeout(() => {
+    el.classList.remove("walk");
+  }, 500);
+}
+
+function startScanner(){
+  const scanner = new Html5Qrcode("reader");
+
+  scanner.start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: 250 },
+    text => {
+
+      if(text === "YOUNG"){
+        if(y < max){
+          y++;
+          move("young", y);
+        }
+      }
+
+      if(text === "OLD"){
+        if(o < max){
+          o++;
+          move("old", o);
+        }
+      }
+
+      if(y === max) alert("🏆 Young reached the top!");
+      if(o === max) alert("🏆 Old reached the top!");
+    }
+  ).catch(err => alert(err));
+}
+
+/* QR GENERATION */
+new QRCode(document.getElementById("q1"), "YOUNG");
+new QRCode(document.getElementById("q2"), "OLD");
+</script>
+
+</body>
+</html>
