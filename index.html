@@ -7,7 +7,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
 <style>
-body{
+body {
   margin:0;
   font-family:Arial;
   text-align:center;
@@ -18,7 +18,7 @@ body{
   display:flex;
   justify-content:center;
   gap:60px;
-  margin-top:30px;
+  margin-top:20px;
 }
 
 .mountain{
@@ -42,7 +42,7 @@ body{
 
 <body>
 
-<h2>🏔 QR Mountain Game</h2>
+<h2>🏔 LIVE GAME</h2>
 
 <div class="container">
   <div class="mountain">
@@ -66,21 +66,28 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+/* IMPORTANT: start from 0 always */
 let y = 0;
 let o = 0;
 const max = 10;
 
+/* MOVE FUNCTION */
 function move(id, step){
+  const el = document.getElementById(id);
+
   let h = 320 / max;
-  document.getElementById(id).style.bottom = (step * h) + "px";
-  document.getElementById(id).style.left = (20 + step * 3) + "%";
+  el.style.bottom = (step * h) + "px";
+  el.style.left = (20 + step * 3) + "%";
 }
 
-/* REAL TIME FIXED LISTENER */
+/* 🔥 FIXED LISTENER */
 db.ref("game").on("child_added", (snap) => {
 
   const data = snap.val();
-  if (!data) return;
+
+  if (!data || !data.player) return;
+
+  console.log("Received:", data.player);
 
   if (data.player === "young") {
     y++;
