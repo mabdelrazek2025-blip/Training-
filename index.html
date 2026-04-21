@@ -11,6 +11,7 @@ body {
   margin: 0;
   font-family: Arial;
   text-align: center;
+
   background: url("https://images.unsplash.com/photo-1506744038136-46273834b3fb") no-repeat center center fixed;
   background-size: cover;
 }
@@ -20,6 +21,7 @@ h2 {
   text-shadow: 0 2px 5px black;
 }
 
+/* BUTTONS */
 button {
   padding: 8px 14px;
   margin: 5px;
@@ -28,12 +30,13 @@ button {
   cursor: pointer;
 }
 
+/* CAMERA */
 #reader {
   width: 300px;
   margin: auto;
 }
 
-/* 2 mountains */
+/* LAYOUT */
 .container {
   display: flex;
   justify-content: center;
@@ -41,7 +44,7 @@ button {
   margin-top: 20px;
 }
 
-/* MOUNTAIN */
+/* CARTOON MOUNTAINS */
 .mountain {
   width: 220px;
   height: 360px;
@@ -79,18 +82,17 @@ button {
   );
 }
 
-/* CHARACTER INSIDE MOUNTAIN */
+/* CHARACTERS */
 .character {
   position: absolute;
   bottom: 0;
-
   font-size: 40px;
 
-  /* inside left side */
   left: 20%;
-
   transform: translateX(-50%);
+
   transition: bottom 0.5s ease, left 0.5s ease;
+
   filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
 }
 </style>
@@ -98,26 +100,27 @@ button {
 
 <body>
 
-<h2>🏔 Inside Mountain Climb Game</h2>
+<h2>🏔 QR Mountain Climb Game</h2>
 
 <button onclick="startScanner()">📷 Start Camera</button>
+<button onclick="resetGame()">🔄 Reset Game</button>
 
 <div id="reader"></div>
 
+<!-- CONTROL BUTTONS -->
 <div>
   <button onclick="manual('YOUNG')">🧑 Young</button>
   <button onclick="manual('OLD')">👴 Old</button>
 </div>
 
+<!-- MOUNTAINS -->
 <div class="container">
 
-  <!-- MOUNTAIN 1 -->
   <div class="mountain">
     <div class="steps"></div>
     <div id="young" class="character">🧑</div>
   </div>
 
-  <!-- MOUNTAIN 2 -->
   <div class="mountain">
     <div class="steps"></div>
     <div id="old" class="character">👴</div>
@@ -135,17 +138,29 @@ let y = 0;
 let o = 0;
 const max = 10;
 
-/* INSIDE DIAGONAL MOVEMENT */
+/* LOAD SAVE */
+window.onload = function(){
+  y = parseInt(localStorage.getItem("young") || "0");
+  o = parseInt(localStorage.getItem("old") || "0");
+
+  move("young", y);
+  move("old", o);
+};
+
+/* SAVE */
+function save(){
+  localStorage.setItem("young", y);
+  localStorage.setItem("old", o);
+}
+
+/* MOVE DIAGONAL INSIDE MOUNTAIN */
 function move(id, step){
   const el = document.getElementById(id);
 
   const maxHeight = 320;
   const stepHeight = maxHeight / max;
 
-  // climb up
   let bottom = step * stepHeight;
-
-  // move slightly to center (still inside mountain)
   let left = 20 + (step * 3);
 
   el.style.bottom = bottom + "px";
@@ -158,15 +173,29 @@ function manual(type){
   if(type === "YOUNG" && y < max){
     y++;
     move("young", y);
+    save();
   }
 
   if(type === "OLD" && o < max){
     o++;
     move("old", o);
+    save();
   }
 
   if(y === max) alert("🏆 Young reached top!");
   if(o === max) alert("🏆 Old reached top!");
+}
+
+/* RESET */
+function resetGame(){
+  y = 0;
+  o = 0;
+
+  move("young", y);
+  move("old", o);
+
+  localStorage.removeItem("young");
+  localStorage.removeItem("old");
 }
 
 /* CAMERA */
