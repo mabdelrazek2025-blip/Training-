@@ -3,42 +3,72 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
 <style>
 body {
-  margin:0;
-  font-family:Arial;
-  text-align:center;
-  background:url("https://images.unsplash.com/photo-1506744038136-46273834b3fb") no-repeat center center fixed;
-  background-size:cover;
+  margin: 0;
+  font-family: Arial;
+  text-align: center;
+  background: url("https://images.unsplash.com/photo-1506744038136-46273834b3fb") no-repeat center center fixed;
+  background-size: cover;
 }
 
-h2{color:white;text-shadow:0 2px 5px black;}
-
-.container{display:flex;justify-content:center;gap:60px;margin-top:20px;}
-
-.mountain{
-  width:220px;height:360px;position:relative;
-  background:linear-gradient(to top,#5a3d2b,#c9a27a);
-  clip-path:polygon(50% 0%,0% 100%,100% 100%);
-  overflow:hidden;
+h2 {
+  color: white;
+  text-shadow: 0 2px 5px black;
 }
 
-.character{
-  position:absolute;
-  bottom:0;
-  left:20%;
-  font-size:40px;
-  transition:bottom 0.5s,left 0.5s;
+/* layout */
+.container {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  margin-top: 20px;
+}
+
+/* mountain */
+.mountain {
+  width: 220px;
+  height: 360px;
+  position: relative;
+
+  background: linear-gradient(to top, #5a3d2b, #c9a27a);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+/* snow */
+.mountain::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 25%;
+  width: 50%;
+  height: 45px;
+  background: white;
+  border-radius: 50%;
+}
+
+/* emoji character */
+.character {
+  position: absolute;
+  bottom: 0;
+  font-size: 40px;
+  left: 20%;
+  transform: translateX(-50%);
+  transition: bottom 0.5s ease, left 0.5s ease;
+  filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
 }
 </style>
 </head>
 
 <body>
 
-<h2>🏔 LIVE QR Mountain Game</h2>
+<h2>🏔 Live QR Mountain Game</h2>
 
 <div class="container">
 
@@ -53,40 +83,53 @@ h2{color:white;text-shadow:0 2px 5px black;}
 </div>
 
 <script>
-// 🔥 FIREBASE CONFIG (put yours here)
+
+let y = 0;
+let o = 0;
+const max = 10;
+
+/* FIREBASE CONFIG */
 const firebaseConfig = {
-  apiKey: "YOUR_KEY",
-  authDomain: "YOUR_DOMAIN",
-  databaseURL: "YOUR_DB",
-  projectId: "YOUR_ID"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://training-60289-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT_ID"
 };
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let y=0, o=0;
-const max=10;
-
+/* MOVE FUNCTION */
 function move(id, step){
-  let bottom = step * 30;
+  const el = document.getElementById(id);
+
+  let height = 320 / max;
+
+  let bottom = step * height;
   let left = 20 + step * 3;
 
-  document.getElementById(id).style.bottom = bottom+"px";
-  document.getElementById(id).style.left = left+"%";
+  el.style.bottom = bottom + "px";
+  el.style.left = left + "%";
 }
 
-// 🔴 REALTIME LISTENER
-db.ref("game").on("value", snap=>{
-  let data = snap.val();
+/* 🔴 LISTEN TO PHONE (IMPORTANT PART) */
+db.ref("game").on("value", (snapshot) => {
+  const data = snapshot.val();
 
-  if(!data) return;
+  if (!data) return;
 
-  if(data.player === "young"){
-    if(y < max){ y++; move("young", y); }
+  if (data.player === "young") {
+    if (y < max) {
+      y++;
+      move("young", y);
+    }
   }
 
-  if(data.player === "old"){
-    if(o < max){ o++; move("old", o); }
+  if (data.player === "old") {
+    if (o < max) {
+      o++;
+      move("old", o);
+    }
   }
 });
 
