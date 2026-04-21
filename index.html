@@ -22,17 +22,57 @@ body { text-align:center; font-family: Arial; }
   background: linear-gradient(to top, #5c3d2e, #dcdcdc);
   clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
   position: relative;
+  overflow: visible;
 }
 
-/* Person image */
-.person {
+/* Character */
+.character {
   position: absolute;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
   width: 60px;
-  transition: bottom 0.5s;
 }
+
+/* Body */
+.body {
+  width: 100%;
+}
+
+/* Legs container */
+.legs {
+  display: flex;
+  justify-content: space-between;
+  width: 40px;
+  margin: auto;
+}
+
+.leg {
+  width: 10px;
+  height: 25px;
+  background: black;
+  transform-origin: top;
+}
+
+/* Walking animation */
+.walk .leg-left {
+  animation: walkLeft 0.4s infinite alternate;
+}
+
+.walk .leg-right {
+  animation: walkRight 0.4s infinite alternate;
+}
+
+@keyframes walkLeft {
+  from { transform: rotate(-20deg); }
+  to { transform: rotate(20deg); }
+}
+
+@keyframes walkRight {
+  from { transform: rotate(20deg); }
+  to { transform: rotate(-20deg); }
+}
+
 </style>
 </head>
 
@@ -46,16 +86,26 @@ body { text-align:center; font-family: Arial; }
 
 <div class="container">
 
-  <!-- Young Man -->
+  <!-- Young -->
   <div class="mountain">
-    <img id="young" class="person"
-    src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png">
+    <div id="young" class="character">
+      <img class="body" src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png">
+      <div class="legs">
+        <div class="leg leg-left"></div>
+        <div class="leg leg-right"></div>
+      </div>
+    </div>
   </div>
 
-  <!-- Old Man -->
+  <!-- Old -->
   <div class="mountain">
-    <img id="old" class="person"
-    src="https://cdn-icons-png.flaticon.com/512/4140/4140051.png">
+    <div id="old" class="character">
+      <img class="body" src="https://cdn-icons-png.flaticon.com/512/4140/4140051.png">
+      <div class="legs">
+        <div class="leg leg-left"></div>
+        <div class="leg leg-right"></div>
+      </div>
+    </div>
   </div>
 
 </div>
@@ -69,9 +119,19 @@ let y=0, o=0;
 const max=10;
 
 function move(id, step){
+  const el = document.getElementById(id);
   const maxHeight = 260;
   const stepHeight = maxHeight / max;
-  document.getElementById(id).style.bottom = (step * stepHeight) + "px";
+
+  // start walking animation
+  el.classList.add("walk");
+
+  el.style.bottom = (step * stepHeight) + "px";
+
+  // stop animation after movement
+  setTimeout(()=>{
+    el.classList.remove("walk");
+  }, 500);
 }
 
 function startScanner(){
@@ -96,7 +156,6 @@ function startScanner(){
   ).catch(err => alert(err));
 }
 
-/* Generate QR */
 new QRCode(document.getElementById("q1"), "YOUNG");
 new QRCode(document.getElementById("q2"), "OLD");
 </script>
