@@ -3,27 +3,28 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
 <style>
 body {
-  margin:0;
-  font-family:Arial;
-  background:#87CEEB;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
+  margin: 0;
+  font-family: Arial;
+  background: #87CEEB;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
 .box {
-  background:white;
-  padding:20px;
-  border-radius:12px;
-  text-align:center;
-  width:80%;
-  box-shadow:0 10px 20px rgba(0,0,0,0.3);
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  width: 80%;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
 }
 </style>
 </head>
@@ -31,18 +32,18 @@ body {
 <body>
 
 <div class="box">
-  <h2>📱 Training- QR Control</h2>
+  <h2>📱 QR Control Page</h2>
   <p id="status">Loading...</p>
 </div>
 
 <script>
 try {
 
-// 🔥 YOUR FIREBASE CONFIG (YOU MUST FILL THIS)
+// 🔥 YOUR FIREBASE CONFIG (FIXED)
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_PROJECT.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+  databaseURL: "https://training-60289-default-rtdb.firebaseio.com",
   projectId: "YOUR_PROJECT_ID"
 };
 
@@ -54,14 +55,14 @@ const db = firebase.database();
 const url = new URLSearchParams(window.location.search);
 const player = url.get("player");
 
-// CHECK
+// CHECK QR VALUE
 if (!player) {
-  document.getElementById("status").innerText = "❌ Missing QR data";
+  document.getElementById("status").innerText = "❌ No player found in QR";
 } else {
 
   document.getElementById("status").innerText = "Sending: " + player;
 
-  // SEND TO DATABASE
+  // SEND TO FIREBASE
   db.ref("game").set({
     player: player,
     time: Date.now()
@@ -73,7 +74,8 @@ if (!player) {
 }
 
 } catch (e) {
-  document.body.innerHTML = "<h3>❌ Error</h3><p>" + e.message + "</p>";
+  document.body.innerHTML =
+    "<h2>❌ Error</h2><p>" + e.message + "</p>";
 }
 </script>
 
