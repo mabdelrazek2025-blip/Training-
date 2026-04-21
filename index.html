@@ -9,71 +9,72 @@
 <style>
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   text-align: center;
-  /* Use your uploaded image filename here */
-  background: url("WhatsApp Image 2026-04-21 at 9.58.14 PM (1).jpeg") no-repeat center center fixed;
+  /* This looks for a file named mountain.jpg in your folder */
+  background: url("mountain.jpg") no-repeat center center fixed;
   background-size: cover;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  overflow: hidden;
 }
 
 h2 {
   color: white;
-  text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
   margin-top: 20px;
+  font-size: 2rem;
 }
 
-/* The Game Area */
+/* The invisible area where characters move */
 .game-area {
   position: relative;
+  flex-grow: 1;
   width: 100%;
-  height: 60vh; /* Adjust height to fit the mountain in the image */
 }
 
-/* Characters */
 .character {
   position: absolute;
-  font-size: 50px;
-  transition: all 0.5s ease-out;
-  filter: drop-shadow(0 5px 5px rgba(0,0,0,0.3));
+  font-size: 60px;
+  transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  filter: drop-shadow(0 10px 5px rgba(0,0,0,0.3));
+  bottom: 15%; /* Starting height */
 }
 
-/* Starting positions for the characters on the path */
-#young {
-  bottom: 10%;
-  left: 30%;
-}
+#young { left: 25%; }
+#old { right: 25%; }
 
-#old {
-  bottom: 10%;
-  right: 30%;
-}
-
-/* Controls at the bottom */
-.controls {
-  background: rgba(0, 0, 0, 0.4);
+/* Bottom Control Bar */
+.footer-controls {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
   padding: 20px;
   display: flex;
   justify-content: center;
-  gap: 20px;
+  align-items: center;
+  gap: 15px;
 }
 
-.score-card {
-  padding: 15px 40px;
-  border-radius: 10px;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
+.card {
   border: none;
-  font-size: 1.2rem;
+  border-radius: 12px;
+  color: white;
+  padding: 15px 30px;
+  cursor: pointer;
+  transition: transform 0.1s;
+  min-width: 140px;
 }
 
-.blue-btn { background: #1e88e5; }
-.orange-btn { background: #e65100; }
-.reset-btn { background: #f44336; }
+.card:active { transform: scale(0.95); }
+
+.blue { background: #2196F3; box-shadow: 0 4px #1976D2; }
+.orange { background: #FF9800; box-shadow: 0 4px #F57C00; }
+.reset { background: #f44336; padding: 15px; border-radius: 50%; }
+
+.card-title { font-size: 14px; display: block; opacity: 0.9; }
+.score-val { font-size: 24px; font-weight: bold; }
 
 </style>
 </head>
@@ -87,20 +88,22 @@ h2 {
   <div id="old" class="character">👴</div>
 </div>
 
-<div class="controls">
-  <button class="score-card blue-btn" onclick="manual('young')">
-    Young Man <br> <span id="y-score">0</span>
+<div class="footer-controls">
+  <button class="card blue" onclick="manual('young')">
+    <span class="card-title">Young Man</span>
+    <span id="y-score" class="score-val">0</span>
   </button>
   
-  <button class="score-card orange-btn" onclick="manual('old')">
-    Old Man <br> <span id="o-score">0</span>
+  <button class="card orange" onclick="manual('old')">
+    <span class="card-title">Old Man</span>
+    <span id="o-score" class="score-val">0</span>
   </button>
 
-  <button class="score-card reset-btn" onclick="resetGame()">🔄</button>
+  <button class="card reset" onclick="resetGame()">🔄</button>
 </div>
 
 <script>
-// --- KEEP YOUR FIREBASE CONFIG HERE ---
+// --- PASTE YOUR ACTUAL FIREBASE CONFIG HERE ---
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -113,28 +116,28 @@ const db = firebase.database();
 
 let y = 0;
 let o = 0;
-const max = 10;
+const maxSteps = 10;
 
-function move(id, step) {
+function move(id, steps) {
   const char = document.getElementById(id);
-  const scoreSpan = document.getElementById(id === 'young' ? 'y-score' : 'o-score');
+  const scoreText = document.getElementById(id === 'young' ? 'y-score' : 'o-score');
   
-  // Update Score Text
-  scoreSpan.innerText = step;
+  scoreText.innerText = steps;
 
-  // Move character up the mountain
-  // This moves them vertically and slightly inward to follow the path
-  let verticalMove = 10 + (step * 7); 
-  char.style.bottom = verticalMove + "%";
+  // Calculate movement
+  // Higher steps move the characters UP and slightly toward the CENTER path
+  let up = 15 + (steps * 6); // Moves from 15% to 75% height
+  let centerIn = 25 + (steps * 1.5); // Moves slightly inward
+
+  char.style.bottom = up + "%";
   
   if(id === 'young') {
-      char.style.left = (30 + (step * 2)) + "%";
+      char.style.left = centerIn + "%";
   } else {
-      char.style.right = (30 + (step * 2)) + "%";
+      char.style.right = centerIn + "%";
   }
 }
 
-/* manual buttons */
 function manual(player){
   db.ref("game").push({
     player: player,
@@ -142,28 +145,34 @@ function manual(player){
   });
 }
 
-/* reset */
 function resetGame(){
+  db.ref("game").remove();
   y = 0;
   o = 0;
   move("young", 0);
   move("old", 0);
-  db.ref("game").remove();
 }
 
-/* realtime listener */
-db.ref("game").on("child_added",(snap)=>{
+// Listen for database updates
+db.ref("game").on("child_added", (snap) => {
   const data = snap.val();
   if(!data) return;
 
-  if(data.player === "young"){
+  if(data.player === "young") {
     y++;
     move("young", y);
-  }
-
-  if(data.player === "old"){
+  } else if(data.player === "old") {
     o++;
     move("old", o);
+  }
+});
+
+// Listener for reset
+db.ref("game").on("value", (snap) => {
+  if(!snap.exists()) {
+    y = 0; o = 0;
+    move("young", 0);
+    move("old", 0);
   }
 });
 
