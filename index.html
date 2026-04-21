@@ -23,8 +23,8 @@ h2 {
 button {
   padding: 8px 14px;
   margin: 5px;
-  border: none;
   border-radius: 10px;
+  border: none;
   cursor: pointer;
 }
 
@@ -33,7 +33,7 @@ button {
   margin: auto;
 }
 
-/* layout */
+/* 2 mountains */
 .container {
   display: flex;
   justify-content: center;
@@ -41,16 +41,19 @@ button {
   margin-top: 20px;
 }
 
-/* mountain */
+/* MOUNTAIN */
 .mountain {
   width: 220px;
   height: 360px;
   position: relative;
+
   background: linear-gradient(to top, #5a3d2b, #c9a27a);
   clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  overflow: hidden;
   box-shadow: 0 10px 25px rgba(0,0,0,0.5);
 }
 
+/* SNOW TOP */
 .mountain::before {
   content: "";
   position: absolute;
@@ -62,7 +65,7 @@ button {
   border-radius: 50%;
 }
 
-/* ramp lines */
+/* STEPS */
 .steps {
   position: absolute;
   width: 100%;
@@ -76,13 +79,16 @@ button {
   );
 }
 
-/* CHARACTER (NOW LEFT SIDE + DIAGONAL) */
+/* CHARACTER INSIDE MOUNTAIN */
 .character {
   position: absolute;
-  left: -30px; /* 👈 outside left of mountain */
   bottom: 0;
 
   font-size: 40px;
+
+  /* inside left side */
+  left: 20%;
+
   transform: translateX(-50%);
   transition: bottom 0.5s ease, left 0.5s ease;
   filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
@@ -92,7 +98,7 @@ button {
 
 <body>
 
-<h2>🏔 Diagonal Mountain Climb Game</h2>
+<h2>🏔 Inside Mountain Climb Game</h2>
 
 <button onclick="startScanner()">📷 Start Camera</button>
 
@@ -129,21 +135,21 @@ let y = 0;
 let o = 0;
 const max = 10;
 
-/* DIAGONAL MOVE */
-function move(id, step, offset){
+/* INSIDE DIAGONAL MOVEMENT */
+function move(id, step){
   const el = document.getElementById(id);
 
   const maxHeight = 320;
   const stepHeight = maxHeight / max;
 
-  // vertical movement
+  // climb up
   let bottom = step * stepHeight;
 
-  // diagonal movement (moves slightly right as it climbs)
-  let left = -30 + (step * 8);
+  // move slightly to center (still inside mountain)
+  let left = 20 + (step * 3);
 
   el.style.bottom = bottom + "px";
-  el.style.left = left + "px";
+  el.style.left = left + "%";
 }
 
 /* CONTROL */
