@@ -17,8 +17,8 @@ body{
 .box{
   background:white;
   padding:20px;
-  margin:auto;
   width:80%;
+  margin:auto;
   border-radius:10px;
 }
 </style>
@@ -46,21 +46,21 @@ const db = firebase.database();
 const url = new URLSearchParams(window.location.search);
 const player = url.get("player");
 
-if (!player) {
-  document.getElementById("status").innerText = "❌ No player";
-} else {
+if(player){
 
   document.getElementById("status").innerText = "Sending: " + player;
 
-  /* IMPORTANT: PUSH DATA */
   db.ref("game").push({
     player: player,
     time: Date.now()
   });
 
-  setTimeout(() => {
+  setTimeout(()=>{
     document.getElementById("status").innerText = "Sent ✔ " + player;
-  }, 800);
+  },800);
+
+}else{
+  document.getElementById("status").innerText = "❌ No player found";
 }
 
 </script>
