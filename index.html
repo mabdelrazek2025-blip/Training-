@@ -11,10 +11,16 @@ body {
   margin: 0;
   font-family: Arial;
   text-align: center;
-  background: #87CEEB; /* simple sky only */
+
+  /* REALISTIC BACKGROUND */
+  background: url("https://images.unsplash.com/photo-1506744038136-46273834b3fb") no-repeat center center fixed;
+  background-size: cover;
 }
 
-h2 { color: white; text-shadow: 0 2px 5px black; }
+h2 {
+  color: white;
+  text-shadow: 0 2px 5px black;
+}
 
 /* BUTTONS */
 button {
@@ -31,7 +37,7 @@ button {
   margin: auto;
 }
 
-/* MOUNTAIN LAYOUT */
+/* 2 MOUNTAINS */
 .container {
   display: flex;
   justify-content: center;
@@ -39,17 +45,17 @@ button {
   margin-top: 20px;
 }
 
-/* CARTOON MOUNTAIN */
+/* CARTOON MOUNTAIN ONLY */
 .mountain {
   width: 220px;
-  height: 340px;
+  height: 360px;
   position: relative;
 
-  /* cartoon gradient */
-  background: linear-gradient(to top, #6b4f2a, #caa472);
+  /* cartoon mountain */
+  background: linear-gradient(to top, #5a3d2b, #c9a27a);
   clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
 
-  box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
 }
 
 /* SNOW TOP */
@@ -59,7 +65,7 @@ button {
   top: 0;
   left: 25%;
   width: 50%;
-  height: 50px;
+  height: 45px;
   background: white;
   border-radius: 50%;
 }
@@ -71,18 +77,18 @@ button {
   height: 100%;
   background-image: repeating-linear-gradient(
     to top,
-    rgba(255,255,255,0.15) 0px,
-    rgba(255,255,255,0.15) 2px,
+    rgba(255,255,255,0.12) 0px,
+    rgba(255,255,255,0.12) 2px,
     transparent 2px,
-    transparent 34px
+    transparent 35px
   );
 }
 
-/* CHARACTER */
+/* REAL CHARACTERS */
 .character {
   position: absolute;
   bottom: 0;
-  width: 55px;
+  width: 60px;
   transform: translateX(-50%);
   transition: bottom 0.5s ease-in-out;
   filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
@@ -92,25 +98,26 @@ button {
 
 <body>
 
-<h2>🏔 Mountain Climb Game</h2>
+<h2>🏔 Real Mountain Climb Game</h2>
 
 <button onclick="startScanner()">📷 Start Camera</button>
 
 <div id="reader"></div>
 
-<!-- QR Buttons -->
+<!-- BUTTONS -->
 <div>
   <button onclick="manual('YOUNG')">🧑 Young</button>
   <button onclick="manual('OLD')">👴 Old</button>
 </div>
 
-<!-- 2 MOUNTAINS -->
+<!-- MOUNTAINS -->
 <div class="container">
 
   <!-- MOUNTAIN 1 -->
   <div class="mountain">
     <div class="steps"></div>
 
+    <!-- REAL IMAGE -->
     <img id="young" class="character"
     src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png"
     style="left:50%;">
@@ -120,6 +127,7 @@ button {
   <div class="mountain">
     <div class="steps"></div>
 
+    <!-- REAL IMAGE -->
     <img id="old" class="character"
     src="https://cdn-icons-png.flaticon.com/512/4140/4140051.png"
     style="left:50%;">
@@ -145,7 +153,7 @@ function move(id, step){
   el.style.bottom = (step * stepHeight) + "px";
 }
 
-/* BUTTON CONTROL */
+/* BUTTON + QR CONTROL */
 function manual(type){
 
   if(type === "YOUNG" && y < max){
