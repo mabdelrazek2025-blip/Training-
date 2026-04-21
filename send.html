@@ -1,25 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
+<style>
+body {
+  font-family: Arial;
+  text-align: center;
+  background: #87CEEB;
+  padding-top: 50px;
+}
+.box {
+  background: white;
+  padding: 20px;
+  margin: auto;
+  width: 80%;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2>📱 QR Control Page</h2>
+  <p id="status">Loading...</p>
+</div>
+
 <script>
-// same firebase config
+try {
+
+// 🔥 PUT YOUR FIREBASE CONFIG HERE
 const firebaseConfig = {
   apiKey: "YOUR_KEY",
   authDomain: "YOUR_DOMAIN",
-  databaseURL: "YOUR_DB",
+  databaseURL: "YOUR_DB_URL",
   projectId: "YOUR_ID"
 };
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-const url = new URLSearchParams(location.search);
+// get QR value
+const url = new URLSearchParams(window.location.search);
 const player = url.get("player");
 
-// send command
+// show status
+document.getElementById("status").innerText =
+  "Sending: " + player;
+
+// send to firebase
 db.ref("game").set({
   player: player
 });
 
-document.body.innerHTML = "Sent ✔ " + player;
+setTimeout(() => {
+  document.getElementById("status").innerText =
+    "Sent ✔ " + player;
+}, 1000);
+
+} catch (e) {
+  document.body.innerHTML =
+    "<h2>❌ Error</h2><p>" + e.message + "</p>";
+}
 </script>
+
+</body>
+</html>
