@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+body { text-align:center; font-family: Arial; }
+
+.mountain {
+  width: 0;
+  height: 0;
+  border-left: 120px solid transparent;
+  border-right: 120px solid transparent;
+  border-bottom: 300px solid brown;
+  display:inline-block;
+  position:relative;
+  margin:30px;
+}
+
+.man {
+  position:absolute;
+  bottom:0;
+  left:-15px;
+  font-size:30px;
+  transition:0.5s;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🏔 QR Mountain Game</h2>
+
+<button onclick="startScanner()">📷 Start Camera</button>
+
+<div id="reader" style="width:300px;margin:auto;"></div>
+
+<div class="mountain">
+  <div id="young" class="man">🧑</div>
+</div>
+
+<div class="mountain">
+  <div id="old" class="man">👴</div>
+</div>
+
+<h3>QR Codes</h3>
+<div id="q1"></div>
+<div id="q2"></div>
+
+<script>
+let y=0, o=0;
+const max=10;
+
+function move(id, step){
+  document.getElementById(id).style.bottom = (step*26)+"px";
+}
+
+function startScanner(){
+  const scanner = new Html5Qrcode("reader");
+
+  scanner.start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: 250 },
+    text => {
+
+      if(text==="YOUNG"){ if(y<max){ y++; move("young",y);} }
+      if(text==="OLD"){ if(o<max){ o++; move("old",o);} }
+
+      if(y===max) alert("Young reached top!");
+      if(o===max) alert("Old reached top!");
+    }
+  ).catch(err => alert(err));
+}
+
+new QRCode(document.getElementById("q1"), "YOUNG");
+new QRCode(document.getElementById("q2"), "OLD");
+</script>
+
+</body>
+</html>
