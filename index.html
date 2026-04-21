@@ -3,94 +3,213 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
 body {
-  margin:0;
+  margin: 0;
   font-family: Arial;
-  text-align:center;
-  background:#87CEEB;
+  text-align: center;
+
+  /* REAL BACKGROUND */
+  background: url("https://images.unsplash.com/photo-1506744038136-46273834b3fb") no-repeat center center fixed;
+  background-size: cover;
 }
 
+h2 {
+  color: white;
+  text-shadow: 0 2px 5px black;
+}
+
+/* BUTTONS */
+button {
+  padding: 8px 14px;
+  margin: 5px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+/* CAMERA */
+#reader {
+  width: 300px;
+  margin: auto;
+}
+
+/* CONTAINER */
 .container {
-  display:flex;
-  justify-content:center;
-  gap:60px;
-  margin-top:30px;
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  margin-top: 20px;
 }
 
+/* CARTOON MOUNTAIN */
 .mountain {
-  width:200px;
-  height:350px;
-  position:relative;
-  background: linear-gradient(to top,#6b4f2a,#caa472);
-  clip-path: polygon(50% 0%,0% 100%,100% 100%);
+  width: 220px;
+  height: 360px;
+  position: relative;
+
+  background: linear-gradient(to top, #5a3d2b, #c9a27a);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
 }
 
+/* SNOW TOP */
+.mountain::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 25%;
+  width: 50%;
+  height: 45px;
+  background: white;
+  border-radius: 50%;
+}
+
+/* STEPS */
+.steps {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: repeating-linear-gradient(
+    to top,
+    rgba(255,255,255,0.12) 0px,
+    rgba(255,255,255,0.12) 2px,
+    transparent 2px,
+    transparent 35px
+  );
+}
+
+/* CHARACTER */
 .character {
-  position:absolute;
-  bottom:0;
-  left:40%;
-  font-size:40px;
-  transition: bottom 0.5s;
+  position: absolute;
+  bottom: 0;
+  font-size: 40px;
+  left: 20%;
+  transform: translateX(-50%);
+  transition: bottom 0.5s ease, left 0.5s ease;
+  filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
 }
 </style>
 </head>
 
 <body>
 
-<h2>🏔 QR Phone-Control Game</h2>
+<h2>🏔 Mountain Climb Game</h2>
 
+<button onclick="startScanner()">📷 Start Camera</button>
+<button onclick="resetGame()">🔄 Reset</button>
+
+<div id="reader"></div>
+
+<!-- MANUAL BUTTONS -->
+<div>
+  <button onclick="manual('YOUNG')">🧑 Young</button>
+  <button onclick="manual('OLD')">👴 Old</button>
+</div>
+
+<!-- MOUNTAINS -->
 <div class="container">
 
   <div class="mountain">
+    <div class="steps"></div>
     <div id="young" class="character">🧑</div>
   </div>
 
   <div class="mountain">
+    <div class="steps"></div>
     <div id="old" class="character">👴</div>
   </div>
 
 </div>
 
+<h3 style="color:white;">QR Codes</h3>
+<div id="q1"></div>
+<div id="q2"></div>
+
 <script>
-// 🔥 FIREBASE CONFIG (replace with yours)
-const firebaseConfig = {
-  apiKey: "YOUR_KEY",
-  authDomain: "YOUR_DOMAIN",
-  databaseURL: "YOUR_DB_URL",
-  projectId: "YOUR_ID"
+
+let y = 0;
+let o = 0;
+const max = 10;
+
+/* LOAD SAVED DATA */
+window.onload = function(){
+  y = parseInt(localStorage.getItem("young") || "0");
+  o = parseInt(localStorage.getItem("old") || "0");
+
+  move("young", y);
+  move("old", o);
 };
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-// movement function
-let y=0, o=0;
-
-function move(el, step){
-  let bottom = step * 30;
-  document.getElementById(el).style.bottom = bottom + "px";
+/* SAVE */
+function save(){
+  localStorage.setItem("young", y);
+  localStorage.setItem("old", o);
 }
 
-// 🔴 LISTEN REAL TIME FROM PHONE
-db.ref("game").on("value", (snap)=>{
+/* MOVE DIAGONAL */
+function move(id, step){
+  const el = document.getElementById(id);
 
-  let data = snap.val();
+  const maxHeight = 320;
+  const stepHeight = maxHeight / max;
 
-  if(data?.player === "young"){
+  let bottom = step * stepHeight;
+  let left = 20 + (step * 3);
+
+  el.style.bottom = bottom + "px";
+  el.style.left = left + "%";
+}
+
+/* CONTROL */
+function manual(type){
+
+  if(type === "YOUNG" && y < max){
     y++;
     move("young", y);
+    save();
   }
 
-  if(data?.player === "old"){
+  if(type === "OLD" && o < max){
     o++;
     move("old", o);
+    save();
   }
 
-});
+  if(y === max) alert("🏆 Young reached top!");
+  if(o === max) alert("🏆 Old reached top!");
+}
+
+/* RESET */
+function resetGame(){
+  y = 0;
+  o = 0;
+
+  move("young", y);
+  move("old", o);
+
+  localStorage.removeItem("young");
+  localStorage.removeItem("old");
+}
+
+/* CAMERA */
+function startScanner(){
+  const scanner = new Html5Qrcode("reader");
+
+  scanner.start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: 250 },
+    text => manual(text)
+  );
+}
+
+/* QR */
+new QRCode(document.getElementById("q1"), "YOUNG");
+new QRCode(document.getElementById("q2"), "OLD");
 
 </script>
 
