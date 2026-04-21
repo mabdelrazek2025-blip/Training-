@@ -12,8 +12,8 @@ body {
   padding: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   text-align: center;
-  /* Using the high-quality clear mountain image */
-  background: url("http://googleusercontent.com/image_collection/image_retrieval/12880971118604804001_0") no-repeat center center fixed;
+  /* This looks for a file named mountain.jpg in your folder */
+  background: url("mountain.jpg") no-repeat center center fixed;
   background-size: cover;
   height: 100vh;
   display: flex;
@@ -23,13 +23,12 @@ body {
 
 h2 {
   color: white;
-  text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
   margin-top: 20px;
-  font-size: 2.2rem;
-  letter-spacing: 1px;
+  font-size: 2rem;
 }
 
-/* The area where emojis climb the path */
+/* The invisible area where characters move */
 .game-area {
   position: relative;
   flex-grow: 1;
@@ -38,54 +37,51 @@ h2 {
 
 .character {
   position: absolute;
-  font-size: 55px;
-  transition: all 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  filter: drop-shadow(0 8px 4px rgba(0,0,0,0.4));
-  bottom: 12%; /* Start at the bottom of the path */
+  font-size: 60px;
+  transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  filter: drop-shadow(0 10px 5px rgba(0,0,0,0.3));
+  bottom: 15%; /* Starting height */
 }
 
-/* Start positions at the beginning of the trail */
-#young { left: 35%; }
-#old { left: 55%; }
+#young { left: 25%; }
+#old { right: 25%; }
 
-/* Score and Control Bar */
+/* Bottom Control Bar */
 .footer-controls {
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
   padding: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 20px;
-  border-top: 2px solid rgba(255,255,255,0.1);
+  gap: 15px;
 }
 
 .card {
   border: none;
-  border-radius: 15px;
+  border-radius: 12px;
   color: white;
-  padding: 12px 25px;
+  padding: 15px 30px;
   cursor: pointer;
-  transition: transform 0.1s, background 0.3s;
-  min-width: 150px;
+  transition: transform 0.1s;
+  min-width: 140px;
 }
 
-.card:hover { opacity: 0.9; }
-.card:active { transform: scale(0.92); }
+.card:active { transform: scale(0.95); }
 
-.blue { background: #1E88E5; box-shadow: 0 5px #1565C0; }
-.orange { background: #FB8C00; box-shadow: 0 5px #EF6C00; }
-.reset { background: #E53935; padding: 15px; border-radius: 50%; box-shadow: 0 5px #B71C1C; }
+.blue { background: #2196F3; box-shadow: 0 4px #1976D2; }
+.orange { background: #FF9800; box-shadow: 0 4px #F57C00; }
+.reset { background: #f44336; padding: 15px; border-radius: 50%; }
 
-.card-title { font-size: 13px; display: block; text-transform: uppercase; margin-bottom: 4px; }
-.score-val { font-size: 28px; font-weight: 800; }
+.card-title { font-size: 14px; display: block; opacity: 0.9; }
+.score-val { font-size: 24px; font-weight: bold; }
 
 </style>
 </head>
 
 <body>
 
-<h2>🏔 MOUNTAIN CHALLENGE</h2>
+<h2>🏔 Mountain Challenge</h2>
 
 <div class="game-area">
   <div id="young" class="character">🧑‍🦱</div>
@@ -107,7 +103,7 @@ h2 {
 </div>
 
 <script>
-// --- REPLACE WITH YOUR ACTUAL FIREBASE CONFIG ---
+// --- PASTE YOUR ACTUAL FIREBASE CONFIG HERE ---
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -128,19 +124,18 @@ function move(id, steps) {
   
   scoreText.innerText = steps;
 
-  // Move characters UP and follow the "winding" mountain path
-  let verticalPos = 12 + (steps * 7); // Moves from 12% to 82% height
-  
-  // This math creates a slight "zigzag" to follow a path
-  let zigzag = (steps % 2 === 0) ? 2 : -2; 
-  let horizontalPos = (id === 'young' ? 35 : 55) + zigzag;
+  // Calculate movement
+  // Higher steps move the characters UP and slightly toward the CENTER path
+  let up = 15 + (steps * 6); // Moves from 15% to 75% height
+  let centerIn = 25 + (steps * 1.5); // Moves slightly inward
 
-  char.style.bottom = verticalPos + "%";
-  char.style.left = horizontalPos + "%";
+  char.style.bottom = up + "%";
   
-  // Scale them down as they get further away (perspective)
-  let scale = 1 - (steps * 0.04);
-  char.style.transform = `scale(${scale})`;
+  if(id === 'young') {
+      char.style.left = centerIn + "%";
+  } else {
+      char.style.right = centerIn + "%";
+  }
 }
 
 function manual(player){
@@ -152,9 +147,13 @@ function manual(player){
 
 function resetGame(){
   db.ref("game").remove();
+  y = 0;
+  o = 0;
+  move("young", 0);
+  move("old", 0);
 }
 
-// Listen for actual data changes
+// Listen for database updates
 db.ref("game").on("child_added", (snap) => {
   const data = snap.val();
   if(!data) return;
@@ -168,7 +167,7 @@ db.ref("game").on("child_added", (snap) => {
   }
 });
 
-// Listener for the reset button (clears screen for everyone)
+// Listener for reset
 db.ref("game").on("value", (snap) => {
   if(!snap.exists()) {
     y = 0; o = 0;
