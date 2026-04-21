@@ -9,23 +9,29 @@
 <style>
 body { text-align:center; font-family: Arial; }
 
-.mountain {
-  width: 0;
-  height: 0;
-  border-left: 120px solid transparent;
-  border-right: 120px solid transparent;
-  border-bottom: 300px solid brown;
-  display:inline-block;
-  position:relative;
-  margin:30px;
+.container {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
 }
 
-.man {
-  position:absolute;
-  bottom:0;
-  left:-15px;
-  font-size:30px;
-  transition:0.5s;
+/* Mountain */
+.mountain {
+  width: 200px;
+  height: 300px;
+  background: linear-gradient(to top, #5c3d2e, #dcdcdc);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  position: relative;
+}
+
+/* Person image */
+.person {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  transition: bottom 0.5s;
 }
 </style>
 </head>
@@ -38,12 +44,20 @@ body { text-align:center; font-family: Arial; }
 
 <div id="reader" style="width:300px;margin:auto;"></div>
 
-<div class="mountain">
-  <div id="young" class="man">🧑</div>
-</div>
+<div class="container">
 
-<div class="mountain">
-  <div id="old" class="man">👴</div>
+  <!-- Young Man -->
+  <div class="mountain">
+    <img id="young" class="person"
+    src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png">
+  </div>
+
+  <!-- Old Man -->
+  <div class="mountain">
+    <img id="old" class="person"
+    src="https://cdn-icons-png.flaticon.com/512/4140/4140051.png">
+  </div>
+
 </div>
 
 <h3>QR Codes</h3>
@@ -55,7 +69,9 @@ let y=0, o=0;
 const max=10;
 
 function move(id, step){
-  document.getElementById(id).style.bottom = (step*26)+"px";
+  const maxHeight = 260;
+  const stepHeight = maxHeight / max;
+  document.getElementById(id).style.bottom = (step * stepHeight) + "px";
 }
 
 function startScanner(){
@@ -66,15 +82,21 @@ function startScanner(){
     { fps: 10, qrbox: 250 },
     text => {
 
-      if(text==="YOUNG"){ if(y<max){ y++; move("young",y);} }
-      if(text==="OLD"){ if(o<max){ o++; move("old",o);} }
+      if(text==="YOUNG"){
+        if(y<max){ y++; move("young",y); }
+      }
 
-      if(y===max) alert("Young reached top!");
-      if(o===max) alert("Old reached top!");
+      if(text==="OLD"){
+        if(o<max){ o++; move("old",o); }
+      }
+
+      if(y===max) alert("🏆 Young reached the top!");
+      if(o===max) alert("🏆 Old reached the top!");
     }
   ).catch(err => alert(err));
 }
 
+/* Generate QR */
 new QRCode(document.getElementById("q1"), "YOUNG");
 new QRCode(document.getElementById("q2"), "OLD");
 </script>
