@@ -8,18 +8,22 @@
 
 <style>
 body {
-  font-family: Arial;
-  text-align: center;
-  background: #87CEEB;
-  padding-top: 50px;
+  margin:0;
+  font-family:Arial;
+  background:#87CEEB;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
 }
+
 .box {
-  background: white;
-  padding: 20px;
-  margin: auto;
-  width: 80%;
-  border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  background:white;
+  padding:20px;
+  border-radius:12px;
+  text-align:center;
+  width:80%;
+  box-shadow:0 10px 20px rgba(0,0,0,0.3);
 }
 </style>
 </head>
@@ -27,45 +31,49 @@ body {
 <body>
 
 <div class="box">
-  <h2>📱 QR Control Page</h2>
+  <h2>📱 Training- QR Control</h2>
   <p id="status">Loading...</p>
 </div>
 
 <script>
 try {
 
-// 🔥 PUT YOUR FIREBASE CONFIG HERE
+// 🔥 YOUR FIREBASE CONFIG (YOU MUST FILL THIS)
 const firebaseConfig = {
-  apiKey: "YOUR_KEY",
-  authDomain: "YOUR_DOMAIN",
-  databaseURL: "YOUR_DB_URL",
-  projectId: "YOUR_ID"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT_ID"
 };
 
+// INIT FIREBASE
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// get QR value
+// GET QR VALUE
 const url = new URLSearchParams(window.location.search);
 const player = url.get("player");
 
-// show status
-document.getElementById("status").innerText =
-  "Sending: " + player;
+// CHECK
+if (!player) {
+  document.getElementById("status").innerText = "❌ Missing QR data";
+} else {
 
-// send to firebase
-db.ref("game").set({
-  player: player
-});
+  document.getElementById("status").innerText = "Sending: " + player;
 
-setTimeout(() => {
-  document.getElementById("status").innerText =
-    "Sent ✔ " + player;
-}, 1000);
+  // SEND TO DATABASE
+  db.ref("game").set({
+    player: player,
+    time: Date.now()
+  });
+
+  setTimeout(() => {
+    document.getElementById("status").innerText = "Sent ✔ " + player;
+  }, 1000);
+}
 
 } catch (e) {
-  document.body.innerHTML =
-    "<h2>❌ Error</h2><p>" + e.message + "</p>";
+  document.body.innerHTML = "<h3>❌ Error</h3><p>" + e.message + "</p>";
 }
 </script>
 
