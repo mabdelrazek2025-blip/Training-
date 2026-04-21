@@ -2,10 +2,11 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
 <script>
+// same firebase config
 const firebaseConfig = {
   apiKey: "YOUR_KEY",
   authDomain: "YOUR_DOMAIN",
-  databaseURL: "YOUR_DB_URL",
+  databaseURL: "YOUR_DB",
   projectId: "YOUR_ID"
 };
 
@@ -15,6 +16,7 @@ const db = firebase.database();
 const url = new URLSearchParams(location.search);
 const player = url.get("player");
 
+// send command
 db.ref("game").set({
   player: player
 });
