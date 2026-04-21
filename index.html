@@ -3,7 +3,6 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
@@ -21,7 +20,6 @@ h2 {
   text-shadow: 0 2px 5px black;
 }
 
-/* layout */
 .container {
   display: flex;
   justify-content: center;
@@ -29,19 +27,15 @@ h2 {
   margin-top: 20px;
 }
 
-/* mountain */
 .mountain {
   width: 220px;
   height: 360px;
   position: relative;
-
   background: linear-gradient(to top, #5a3d2b, #c9a27a);
   clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
   overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
 }
 
-/* snow */
 .mountain::before {
   content: "";
   position: absolute;
@@ -53,7 +47,6 @@ h2 {
   border-radius: 50%;
 }
 
-/* emoji character */
 .character {
   position: absolute;
   bottom: 0;
@@ -68,7 +61,7 @@ h2 {
 
 <body>
 
-<h2>🏔 Live QR Mountain Game</h2>
+<h2>🏔 QR Mountain Game (LIVE)</h2>
 
 <div class="container">
 
@@ -103,34 +96,35 @@ const db = firebase.database();
 function move(id, step){
   const el = document.getElementById(id);
 
-  let height = 320 / max;
+  const stepHeight = 320 / max;
 
-  let bottom = step * height;
+  let bottom = step * stepHeight;
   let left = 20 + step * 3;
 
   el.style.bottom = bottom + "px";
   el.style.left = left + "%";
 }
 
-/* 🔴 LISTEN TO PHONE (IMPORTANT PART) */
-db.ref("game").on("value", (snapshot) => {
+/* 🔴 REALTIME LISTENER (FIXED) */
+db.ref("game").on("child_added", (snapshot) => {
+
   const data = snapshot.val();
+  const player = data.player;
 
-  if (!data) return;
-
-  if (data.player === "young") {
+  if (player === "young") {
     if (y < max) {
       y++;
       move("young", y);
     }
   }
 
-  if (data.player === "old") {
+  if (player === "old") {
     if (o < max) {
       o++;
       move("old", o);
     }
   }
+
 });
 
 </script>
