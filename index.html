@@ -7,64 +7,44 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
 <style>
-body {
-  margin: 0;
-  font-family: Arial;
-  text-align: center;
-  background: url("https://images.unsplash.com/photo-1506744038136-46273834b3fb") no-repeat center center fixed;
-  background-size: cover;
+body{
+  margin:0;
+  font-family:Arial;
+  text-align:center;
+  background:#87CEEB;
 }
 
-h2 {
-  color: white;
-  text-shadow: 0 2px 5px black;
+.container{
+  display:flex;
+  justify-content:center;
+  gap:60px;
+  margin-top:30px;
 }
 
-.container {
-  display: flex;
-  justify-content: center;
-  gap: 60px;
-  margin-top: 20px;
+.mountain{
+  width:220px;
+  height:360px;
+  position:relative;
+  background:linear-gradient(to top,#5a3d2b,#c9a27a);
+  clip-path:polygon(50% 0%,0% 100%,100% 100%);
 }
 
-.mountain {
-  width: 220px;
-  height: 360px;
-  position: relative;
-  background: linear-gradient(to top, #5a3d2b, #c9a27a);
-  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-  overflow: hidden;
-}
-
-.mountain::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 25%;
-  width: 50%;
-  height: 45px;
-  background: white;
-  border-radius: 50%;
-}
-
-.character {
-  position: absolute;
-  bottom: 0;
-  font-size: 40px;
-  left: 20%;
-  transform: translateX(-50%);
-  transition: bottom 0.5s ease, left 0.5s ease;
-  filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
+.character{
+  position:absolute;
+  bottom:0;
+  font-size:40px;
+  left:20%;
+  transform:translateX(-50%);
+  transition:0.3s;
 }
 </style>
 </head>
 
 <body>
 
-<h2>🏔 QR Mountain Game (LIVE)</h2>
+<h2>🏔 QR Mountain Game</h2>
 
 <div class="container">
-
   <div class="mountain">
     <div id="young" class="character">🧑</div>
   </div>
@@ -72,16 +52,10 @@ h2 {
   <div class="mountain">
     <div id="old" class="character">👴</div>
   </div>
-
 </div>
 
 <script>
 
-let y = 0;
-let o = 0;
-const max = 10;
-
-/* FIREBASE CONFIG */
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -92,37 +66,30 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-/* MOVE FUNCTION */
+let y = 0;
+let o = 0;
+const max = 10;
+
 function move(id, step){
-  const el = document.getElementById(id);
-
-  const stepHeight = 320 / max;
-
-  let bottom = step * stepHeight;
-  let left = 20 + step * 3;
-
-  el.style.bottom = bottom + "px";
-  el.style.left = left + "%";
+  let h = 320 / max;
+  document.getElementById(id).style.bottom = (step * h) + "px";
+  document.getElementById(id).style.left = (20 + step * 3) + "%";
 }
 
-/* 🔴 REALTIME LISTENER (FIXED) */
-db.ref("game").on("child_added", (snapshot) => {
+/* REAL TIME FIXED LISTENER */
+db.ref("game").on("child_added", (snap) => {
 
-  const data = snapshot.val();
-  const player = data.player;
+  const data = snap.val();
+  if (!data) return;
 
-  if (player === "young") {
-    if (y < max) {
-      y++;
-      move("young", y);
-    }
+  if (data.player === "young") {
+    y++;
+    move("young", y);
   }
 
-  if (player === "old") {
-    if (o < max) {
-      o++;
-      move("old", o);
-    }
+  if (data.player === "old") {
+    o++;
+    move("old", o);
   }
 
 });
